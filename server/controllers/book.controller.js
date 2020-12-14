@@ -1,41 +1,93 @@
 'use strict';
 
-const debug = require('debug')('techreads-server:BookController');
+const debug = require('debug')('techreads-server:BooksController');
 const booksData = require('../data/books.json');
 
-class BookController {
+class BooksController {
   constructor(rootController) {
     this.books = booksData;
     this.rootController = rootController;
 
+    this.generateAvgRating();
+
     // Binding 'this' to all the methods used in routes
     this.getAllBooks = this.getAllBooks.bind(this);
     this.getAllCategories = this.getAllCategories.bind(this);
+    this.getBestRated = this.getBestRated.bind(this);
     this.getBookById = this.getBookById.bind(this);
     this.searchBook = this.searchBook.bind(this);
     this.rateBook = this.rateBook.bind(this);
     this.reviewBook = this.reviewBook.bind(this);
+
+    debug('BooksController object created');
   }
 
-  findBooks(by = [{ field: 'id', value: 0 }]) {
-    const conditionArr = by.map((condition) => {
-      if (Object.keys(this.books).indexOf(condition.field) !== -1) {
-        throw new Error(`Field ${condition.field} could not be found in books object`);
+  generateAvgRating() {
+    for (let i = 0; i < this.books.length; i++) {
+      const sumRating = this.books[i].ratings.reduce((acc, val) => acc + val, 0);
+      const avgRating = (sumRating / this.books[i].ratings.length) || 0;
+
+      this.books[i].avgRating = avgRating;
+    }
+  }
+
+  isFieldValid(field) {
+    if (Object.keys(this.books).indexOf(field) !== -1) {
+      throw new Error(`Field '${field}' could not be found in books object`);
+    }
+    return true;
+  }
+
+  filterBooks(books = [], filter) {
+    // If the type of the query is a string (passed through a HTTP request)
+    // Attempt to parse it as JSON, if it fails default to quick search
+    if (typeof (filter) === 'string') {
+      try {
+        filter = JSON.parse(filter);
+      } catch (err) {
+        filter = {
+          title: filter,
+          description: filter
+        };
       }
-      const regex = new RegExp(condition.value, 'i');
-      return `(JSON.stringify(book.${condition.field}).search(${regex}) !== -1)`;
-    });
-    debug(`this.books.filter(book => ${conditionArr.join(' || ')})`);
-    return eval(`this.books.filter(book => ${conditionArr.join(' || ')})`);
+    }
+    if (typeof (filter) === 'object') {
+      const keys = Object.keys(filter);
+      const condition = [];
+      keys.forEach((field) => {
+        // Sanitize the key: value to make sure no JS is injected
+        this.isFieldValid(field);
+        const regex = new RegExp(filter[field], 'i');
+        condition.push(`(JSON.stringify(book.${field}).search(${regex}) !== -1)`);
+      });
+      debug(`books.filter(book => ${condition.join(' || ')})`);
+      return eval(`books.filter(book => ${condition.join(' || ')})`);
+    }
+    return books;
   }
 
-  getAllBooks(_, res) {
-    if (this.books.length) {
+  // eslint-disable-next-line class-methods-use-this
+  sortBooks(books = [], sort) {
+    if (sort) {
+      return books.sort((a, b) => a.title.toLowerCase().localeCompare(b.title.toLowerCase()));
+    }
+    return books;
+  }
+
+  findBooks(by, sort, limit = 0) {
+    let result = this.sortBooks(this.filterBooks(this.books, by), sort);
+    return (limit) ? result.slice(0, limit) : result;
+  }
+
+  getAllBooks(req, res) {
+    const { limit } = req.params;
+    const books = this.findBooks(undefined, true, limit);
+    if (books.length) {
       res.status(200);
     } else {
       res.status(404);
     }
-    res.send(this.books);
+    res.send(books);
   }
 
   getAllCategories(_, res) {
@@ -48,43 +100,40 @@ class BookController {
     res.send(categories);
   }
 
-  getBookById(req, res) {
-    const { id } = req.params;
-    const booksFound = this.findBooks([{ field: 'id', value: id || -1 }]);
-    if (booksFound.length) {
+  getBestRated(_, res) {
+    const bestRated = this.books.sort((a, b) => b.avgRating - a.avgRating);
+    if (bestRated.length) {
       res.status(200);
     } else {
       res.status(404);
     }
-    res.send(booksFound);
+    res.send(bestRated.slice(0, 5));
+  }
+
+  getBookById(req, res) {
+    const { id = -1 } = req.params;
+    const bookFound = this.books.find(book => book.id === id);
+    if (bookFound) {
+      res.status(200);
+    } else {
+      res.status(404);
+    }
+    res.send(bookFound);
   }
 
   searchBook(req, res) {
-    let { search } = req.query;
-
-    // If the type of the query is a string (passed through URL with ?search=text)
-    // then fallback to searching title and description using the value provided
-    if (typeof (search) === 'string') {
-      search = [
-        { field: 'title', value: search },
-        { field: 'description', value: search }
-      ];
-    }
-
-    if (search.length) {
-      try {
-        const booksFound = this.findBooks(search);
-        if (booksFound.length) {
-          res.status(200);
-        } else {
-          res.status(404);
-        }
-        res.send(booksFound);
-      } catch (err) {
-        res.status(500).send('Invalid field specified');
+    let { search, limit } = req.query;
+    try {
+      const booksFound = this.findBooks(search, true, limit);
+      if (booksFound.length) {
+        res.status(200);
+      } else {
+        res.status(404);
       }
+      res.send(booksFound);
+    } catch (err) {
+      res.status(500).send('Invalid field specified');
     }
-    res.status(404).send();
   }
 
   rateBook(req, res) {
@@ -104,4 +153,4 @@ class BookController {
   }
 }
 
-module.exports = BookController;
+module.exports = BooksController;

@@ -1,5 +1,7 @@
 'use strict';
 
+const debug = require('debug')('techreads-server:InterestsController');
+
 class InterestsController {
   constructor(rootController) {
     this.interests = [];
@@ -8,6 +10,8 @@ class InterestsController {
     // Binding 'this' to all the methods used in routes
     this.getInterests = this.getInterests.bind(this);
     this.addInterests = this.addInterests.bind(this);
+
+    debug('InterestsController object created');
   }
 
   getInterests(req, res) {

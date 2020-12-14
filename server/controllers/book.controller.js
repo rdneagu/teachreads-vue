@@ -146,10 +146,13 @@ class BooksController {
 
   reviewBook(req, res) {
     const { id } = req.params;
-    const { reviewer, review } = req.body;
+    const data = {
+      reviewer: (req.body.reviewer.length) ? req.body.reviewer : 'Anonymous User',
+      review: req.body.review
+    };
     const book = this.books.find(b => b.id === id);
-    book.reviews.push(reviewer, review);
-    res.status(202).send(book);
+    book.reviews.push(data);
+    res.status(202).send(data);
   }
 }
 

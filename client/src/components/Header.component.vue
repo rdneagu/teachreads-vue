@@ -11,10 +11,26 @@
       <!-- <div class="search-filter">TITLE</div> -->
       <Button name="search" icon="search" type="search" />
     </section>
+    <section class="header-user">
+      <template v-if="switching.state">
+        <span v-if="switching.pending">Loading user</span>
+        <template v-else>
+          <input class="input-switch" :value="getCurrentUser" @input="switching.value = $event.target.value" />
+          <Button class="confirm-switch" type="dialog" icon="confirm-switch" :click="confirmSwitch" />
+          <Button class="cancel-switch" type="dialog" icon="cancel-switch" :click="cancelSwitch" />
+        </template>
+      </template>
+      <template v-else>
+        <span class="user-name">{{ getCurrentUser }}</span>
+        <Button class="switch" type="dialog" icon="switch" :click="startSwitch" />
+      </template>
+    </section>
   </header>
 </template>
 
 <script>
+import { invokeAPI } from '@/lib/util.js';
+
 import Button from '@/components/Button.component';
 
 export default {
@@ -22,17 +38,16 @@ export default {
   components: { Button },
   data() {
     return {
+      switching: {
+        state: false,
+        pending: false,
+      },
       detached: false,
     };
   },
 
-  computed: {
-    isDetached() {
-      return (this.detached) ? 'detached' : null;
-    },
-  },
-
   mounted() {
+    this.switching.value = this.getCurrentUser;
     window.addEventListener('scroll', this.OnScroll);
   },
 
@@ -40,7 +55,42 @@ export default {
     window.removeEventListener('scroll', this.OnScroll);
   },
 
+  computed: {
+    getCurrentUser() {
+      if (this.switching.state) {
+        return this.switching.value;
+      }
+      const { user } = this.$store.state;
+      return (user && user.name) ? user.name : 'Guest';
+    },
+    isDetached() {
+      return (this.detached) ? 'detached' : null;
+    },
+  },
+
   methods: {
+    startSwitch() {
+      this.switching.state = true;
+    },
+    cancelSwitch() {
+      this.switching.state = false;
+      this.switching.value = this.getCurrentUser;
+    },
+    async confirmSwitch() {
+      this.switching.pending = true;
+      const name = this.switching.value;
+      if (name.length < 3 || name.toLowerCase().match('guest')) {
+        this.$store.commit('unsetUser');
+      } else {
+        const history = await invokeAPI(`/api/history/${name}`);
+        console.log(history);
+        const wishlist = await invokeAPI(`/api/wishlist/${name}`);
+        this.$store.commit('setUser', { name, history, wishlist });
+      }
+      this.switching.state = false;
+      this.switching.value = this.getCurrentUser;
+      this.switching.pending = false;
+    },
     OnScroll() {
       if (window.scrollY > 0) {
         this.detached = true;
@@ -53,13 +103,13 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '@/scss/_mixins';
 
-header {
+.header-vue {
   font-size: 16px;
   position: fixed;
-  width: 100%;
+  left: 0; right: 0;
   height: 75px;
   display: grid;
   grid-template-columns: 3fr 4fr 3fr;
@@ -110,7 +160,6 @@ header {
 
     input {
       flex: 1;
-      font-size: 1em;
       padding: 5px 10px;
       font-weight: 600;
 
@@ -130,6 +179,26 @@ header {
       padding: 0 10px;
       background-color: $apricot;
       color: black;
+    }
+  }
+
+  .header-user {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    > * {
+      margin: 0 5px;
+    }
+    .user-name {
+      margin: 0 8px;
+    }
+    .input-switch {
+      align-self: stretch;
+      background-color: rgba($apricot, .2);
+      padding: 0 10px;
+    }
+    .button-vue .button {
+      padding: 2px 6px;
     }
   }
 }

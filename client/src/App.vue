@@ -22,6 +22,7 @@ html, body, #app {
   display: flex;
   flex: 1;
   min-height: 100vh;
+  font-size: 14px;
 }
 
 #app {
@@ -29,7 +30,6 @@ html, body, #app {
   background-color: $old-lavender;
   color: $apricot;
   font-family: Raleway, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 

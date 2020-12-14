@@ -48,7 +48,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '@/scss/_mixins.scss';
 
 .button-vue {
@@ -65,16 +65,13 @@ export default {
       font-weight: 600;
       text-align: center;
     }
-    .icon-wrapper {
+    .icon-vue {
       position: relative;
-      margin: 0 8px 0 0;
+      margin: 0 4px 0 4px;
     }
     &.inversed {
-      .text { order: 1 };
-      .icon-wrapper {
-        order: 2;
-        margin: 0 0 0 8px;
-      }
+      .text { order: 1; }
+      .icon-vue { order: 2; }
     }
     &.disabled {
       cursor: default;

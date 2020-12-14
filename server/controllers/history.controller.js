@@ -17,18 +17,14 @@ class HistoryController {
   getReadHistory(req, res) {
     const { user } = req.params;
     const result = this.history.filter(read => (read.user === user));
-    if (result.length) {
-      res.status(200);
-    } else {
-      res.status(404);
-    }
-    res.send(result);
+    res.status(200).send(result);
   }
 
   addReadHistory(req, res) {
-    const { user = 'Anonymous User', book, date = Date.now() } = req.body;
-    this.history.push({ user, book, date });
-    res.status(202).send();
+    const { user, book, date = Date.now() } = req.body;
+    const data = { user, book, date };
+    this.history.push(data);
+    res.status(202).send(data);
   }
 }
 

@@ -7,7 +7,7 @@ const logger = require('morgan');
 const debug = require('debug')('techreads-server:index');
 
 // Load custom routes
-const { booksRoutes, historyRoutes, interestsRoutes } = require('./routes/_index');
+const { booksRoutes, historyRoutes, interestsRoutes, wishlistRoutes } = require('./routes/_index');
 
 const app = express();
 app.use(logger('dev'));
@@ -20,6 +20,7 @@ app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
 booksRoutes.config(app);
 historyRoutes.config(app);
 interestsRoutes.config(app);
+wishlistRoutes.config(app);
 
 // Only deal with index.html, Vue routing will handle 404 links
 app.get('*', (_, res) => {

@@ -17,18 +17,14 @@ class InterestsController {
   getInterests(req, res) {
     const { user } = req.params;
     const result = this.interests.filter(topic => (topic.user === user));
-    if (result.length) {
-      res.status(200);
-    } else {
-      res.status(404);
-    }
-    res.send(result);
+    res.status(200).send(result);
   }
 
   addInterests(req, res) {
-    const { user = 'Anonymous User', topic } = req.body;
-    this.interests.push({ user, topic });
-    res.status(202).send();
+    const { user, topic } = req.body;
+    const data = { user, topic };
+    this.interests.push(data);
+    res.status(202).send(data);
   }
 }
 

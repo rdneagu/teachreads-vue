@@ -22,6 +22,9 @@ exports.config = (app) => {
   app.post('/api/books/:id/rate', BooksController.rateBook);
 
   /* POST new review for book by id */
-  /* body should be of the form {"reviewer":"anon", "review":"Great book"}  */
+  /* body should be of the form {"reviewer":"anon", "review":"Great book"} */
   app.post('/api/books/:id/review', BooksController.reviewBook);
+
+  /* GET books recommendations */
+  app.get('/api/books/:user/recommend', BooksController.getAllRecommendations);
 };

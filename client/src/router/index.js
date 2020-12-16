@@ -18,9 +18,14 @@ const routes = [
     component: () => import('../views/books/Book.view.vue'),
   },
   {
-    path: '/about',
-    name: 'AboutView',
-    component: () => import('../views/About.view.vue'),
+    path: '/profile/:name',
+    name: 'ProfileView',
+    component: () => import('../views/profile/Profile.view.vue'),
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: '404View',
+    component: () => import('../views/404.view.vue'),
   },
 ];
 

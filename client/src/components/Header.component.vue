@@ -16,13 +16,13 @@
         <span v-if="switching.pending">Loading user</span>
         <template v-else>
           <input class="input-switch" :value="getCurrentUser" @input="switching.value = $event.target.value" />
-          <Button class="confirm-switch" type="dialog" icon="confirm-switch" :click="confirmSwitch" />
-          <Button class="cancel-switch" type="dialog" icon="cancel-switch" :click="cancelSwitch" />
+          <Button v-bind="buttons.confirmSwitch" v-tooltip="{ text: 'Confirm Switch' }" />
+          <Button v-bind="buttons.cancelSwitch" v-tooltip="{ text: 'Cancel Switch' }" />
         </template>
       </template>
       <template v-else>
-        <span class="user-name">{{ getCurrentUser }}</span>
-        <Button class="switch" type="dialog" icon="switch" :click="startSwitch" />
+        <Button :href="getProfileHref" v-bind="buttons.openProfile" v-tooltip="{ text: 'View Profile' }">{{ getCurrentUser }}</Button>
+        <Button class="switch" v-bind="buttons.startSwitch" v-tooltip="{ text: 'Switch User' }"  />
       </template>
     </section>
   </header>
@@ -38,6 +38,12 @@ export default {
   components: { Button },
   data() {
     return {
+      buttons: {
+        confirmSwitch: { type: 'dialog', icon: 'confirm-switch', name: 'switch', click: () => this.confirmSwitch() },
+        cancelSwitch: { type: 'dialog', icon: 'cancel-switch', name: 'switch', click: () => this.cancelSwitch() },
+        startSwitch: { type: 'dialog', icon: 'switch', name: 'switch', click: () => this.startSwitch() },
+        openProfile: { type: 'border', name: 'view-profile' },
+      },
       switching: {
         state: false,
         pending: false,
@@ -46,9 +52,15 @@ export default {
     };
   },
 
-  mounted() {
-    this.switching.value = this.getCurrentUser;
+  async mounted() {
     window.addEventListener('scroll', this.OnScroll);
+
+    const userCookie = this.$cookie.getCookie('user');
+    if (userCookie) {
+      await this.confirmSwitch(userCookie);
+    }
+
+    this.switching.value = this.getCurrentUser;
   },
 
   unmounted() {
@@ -63,6 +75,9 @@ export default {
       const { user } = this.$store.state;
       return (user && user.name) ? user.name : 'Guest';
     },
+    getProfileHref() {
+      return (this.$store.state.user) ? `/profile/${this.getCurrentUser}` : null;
+    },
     isDetached() {
       return (this.detached) ? 'detached' : null;
     },
@@ -73,23 +88,30 @@ export default {
       this.switching.state = true;
     },
     cancelSwitch() {
+      this.switching.pending = false;
       this.switching.state = false;
       this.switching.value = this.getCurrentUser;
     },
-    async confirmSwitch() {
+    async confirmSwitch(fromCookie) {
       this.switching.pending = true;
-      const name = this.switching.value;
+      const name = fromCookie || this.switching.value;
+      if (this.$store.state.user && this.$store.state.user.name === name) {
+        return this.cancelSwitch();
+      }
       if (name.length < 3 || name.toLowerCase().match('guest')) {
+        this.$cookie.removeCookie('user');
         this.$store.commit('unsetUser');
       } else {
         const history = await invokeAPI(`/api/history/${name}`);
-        console.log(history);
         const wishlist = await invokeAPI(`/api/wishlist/${name}`);
-        this.$store.commit('setUser', { name, history, wishlist });
+        const interests = await invokeAPI(`/api/interests/${name}`);
+        this.$cookie.setCookie('user', name, { expire: '7d' });
+        this.$store.commit('setUser', { name, history, wishlist, interests });
       }
       this.switching.state = false;
       this.switching.value = this.getCurrentUser;
       this.switching.pending = false;
+      return true;
     },
     OnScroll() {
       if (window.scrollY > 0) {
@@ -189,16 +211,16 @@ export default {
     > * {
       margin: 0 5px;
     }
-    .user-name {
-      margin: 0 8px;
-    }
     .input-switch {
       align-self: stretch;
       background-color: rgba($apricot, .2);
-      padding: 0 10px;
+      padding: 2px 10px;
+      border: 1px solid $apricot;
+      border-width: 2px 0;
+      border-radius: 4px;
     }
-    .button-vue .button {
-      padding: 2px 6px;
+    .btn-switch {
+      padding: 4px 8px;
     }
   }
 }

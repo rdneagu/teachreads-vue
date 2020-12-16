@@ -8,5 +8,8 @@ exports.config = (app) => {
 
   // /* POST new item in wishlist by user */
   // /* body should be of the form {"user":"anon", "book":1} */
-  app.post('/api/wishlist/add', WishlistController.addToWishlist);
+  app.post('/api/wishlist/add', WishlistController.addWishlistItem);
+
+  // /* DELETE book from user's wishlist */
+  app.delete('/api/wishlist/:user/delete/:book', WishlistController.deleteWishlistItem);
 };

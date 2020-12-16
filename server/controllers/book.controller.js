@@ -8,11 +8,10 @@ class BooksController {
     this.books = booksData;
     this.rootController = rootController;
 
-    this.generateAvgRating();
-
     // Binding 'this' to all the methods used in routes
     this.getAllBooks = this.getAllBooks.bind(this);
     this.getAllCategories = this.getAllCategories.bind(this);
+    this.getAllRecommendations = this.getAllRecommendations.bind(this);
     this.getBestRated = this.getBestRated.bind(this);
     this.getBookById = this.getBookById.bind(this);
     this.searchBook = this.searchBook.bind(this);
@@ -20,15 +19,6 @@ class BooksController {
     this.reviewBook = this.reviewBook.bind(this);
 
     debug('BooksController object created');
-  }
-
-  generateAvgRating() {
-    for (let i = 0; i < this.books.length; i++) {
-      const sumRating = this.books[i].ratings.reduce((acc, val) => acc + val, 0);
-      const avgRating = (sumRating / this.books[i].ratings.length) || 0;
-
-      this.books[i].avgRating = avgRating;
-    }
   }
 
   isFieldValid(field) {
@@ -74,8 +64,26 @@ class BooksController {
     return books;
   }
 
+  computeData(books = []) {
+    books = books.map((book) => {
+      const sumRating = book.ratings.reduce((acc, val) => acc + val, 0);
+      const avgRating = (sumRating / book.ratings.length) || 0;
+
+      const nWished = this.rootController.WishlistController.wishlist.filter(w => w.book === book.id).length;
+      const nRead = this.rootController.HistoryController.history.filter(h => h.book === book.id).length;
+
+      return {
+        ...book,
+        avgRating,
+        nRead,
+        nWished
+      };
+    });
+    return books;
+  }
+
   findBooks(by, sort, limit = 0) {
-    let result = this.sortBooks(this.filterBooks(this.books, by), sort);
+    let result = this.computeData(this.sortBooks(this.filterBooks(this.books, by), sort));
     return (limit) ? result.slice(0, limit) : result;
   }
 
@@ -100,6 +108,24 @@ class BooksController {
     res.send(categories);
   }
 
+  getAllRecommendations(req, res) {
+    const { user } = req.params;
+    const wishlist = this.rootController.WishlistController.getWishlist(user);
+    const history = this.rootController.HistoryController.getReadHistory(user);
+    const interests = this.rootController.InterestsController.getInterests(user);
+    const distinctInterests = wishlist.concat(history).concat(interests)
+      .filter((book1, i, arr) => arr.findIndex(book2 => book1.id === book2.id) === i)
+      .filter((book1, i, arr) => arr.findIndex(book2 => book1.category === book2.category) === i)
+      .filter((interest1, i, arr) => arr.findIndex(interest2 => interest1.category === interest2.category) === i);
+    if (distinctInterests.length) {
+      const recommendations = this.books.filter(book => distinctInterests.find(interest => interest.category === book.category))
+        .sort((a, b) => b.avgRating - a.avgRating)
+        .splice(0, 10);
+      return res.status(200).send(this.computeData(recommendations));
+    }
+    return res.status(200).send();
+  }
+
   getBestRated(_, res) {
     const bestRated = this.books.sort((a, b) => b.avgRating - a.avgRating);
     if (bestRated.length) {
@@ -110,15 +136,33 @@ class BooksController {
     res.send(bestRated.slice(0, 5));
   }
 
-  getBookById(req, res) {
-    const { id = -1 } = req.params;
-    const bookFound = this.books.find(book => book.id === id);
-    if (bookFound) {
-      res.status(200);
-    } else {
-      res.status(404);
+  /**
+   * Overloaded getBookById method: see https://stackoverflow.com/a/17137284
+   *
+   * 1 param: getBookById(id)
+   * 3 param: getBookById(req, res, next)
+   */
+  getBookById() {
+    const overload = {
+      1: (id) => {
+        return this.computeData(this.books.filter(book => book.id === id))[0];
+      },
+      3: (req, res) => {
+        const { id = -1 } = req.params;
+        const bookFound = this.getBookById(id);
+        if (bookFound) {
+          res.status(200);
+        } else {
+          res.status(404);
+        }
+        res.send(bookFound);
+      }
+    };
+
+    if (!overload[arguments.length]) {
+      throw new Error(`getInterests with ${arguments.length} does not exist`);
     }
-    res.send(bookFound);
+    return overload[arguments.length].apply(this, arguments);
   }
 
   searchBook(req, res) {

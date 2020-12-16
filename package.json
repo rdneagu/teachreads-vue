@@ -11,6 +11,7 @@
     "start": "yarn build && yarn server"
   },
   "dependencies": {
+    "apexcharts": "^3.23.0",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
@@ -19,7 +20,9 @@
     "lodash": "^4.17.20",
     "morgan": "^1.10.0",
     "vue": "^3.0.0",
+    "vue-cookie-next": "^1.0.3",
     "vue-router": "^4.0.0-0",
+    "vue3-apexcharts": "^1.1.1",
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {

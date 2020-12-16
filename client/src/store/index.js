@@ -12,6 +12,12 @@ export default createStore({
     unsetUser(state) {
       state.user = null;
     },
+    showTooltip(state, tooltip) {
+      state.tooltip = tooltip;
+    },
+    hideTooltip(state) {
+      state.tooltip = null;
+    },
   },
   actions: {
   },

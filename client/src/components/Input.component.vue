@@ -6,7 +6,7 @@
       <input v-else :id="id" :name="id" :type="getInputType" :placeholder="placeholder" v-model="model" :maxlength="maxlength" />
       <span v-if="maxlength" class="input-limit">{{ getCharLimit }}</span>
     </div>
-    <Icon v-if="error" class="error" name="warning"></Icon>
+    <Icon v-if="error" class="error" name="warning" v-tooltip="{ type: 'alert', text: error }"></Icon>
   </div>
 </template>
 

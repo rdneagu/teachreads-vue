@@ -2,14 +2,16 @@
   <Background />
   <Header />
   <router-view class="view" />
+  <Tooltip />
 </template>
 
 <script>
 import Background from '@/components/Background.component';
 import Header from '@/components/Header.component';
+import Tooltip from '@/components/Tooltip.component.vue';
 
 export default {
-  components: { Background, Header },
+  components: { Background, Header, Tooltip },
 };
 </script>
 

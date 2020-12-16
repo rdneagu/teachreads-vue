@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isCondition" class="button-vue">
+  <div v-if="isCondition" class="button-vue" v-tooltip="{ ...tooltip }">
     <router-link v-if="href" :to="href" class="button" :class="[ getName, getStyle, isActive ]">
       <Icon v-if="icon" :name="icon"></Icon>
       <span v-if="text || $slots.default" class="text"><slot>{{ this.text }}</slot></span>
@@ -16,7 +16,7 @@ import Icon from './Icon.component.vue';
 
 export default {
   name: 'ButtonComponent',
-  props: ['name', 'href', 'type', 'icon', 'text', 'click', 'disabled', 'active', 'pending', 'condition'],
+  props: ['name', 'href', 'type', 'icon', 'text', 'click', 'disabled', 'active', 'pending', 'condition', 'tooltip'],
   components: { Icon },
   computed: {
     getName() {
@@ -59,15 +59,16 @@ export default {
     align-items: center;
     justify-content: center;
     color: black;
+    font-weight: 600;
     word-wrap: nowrap;
     cursor: pointer;
     .text {
-      font-weight: 600;
       text-align: center;
+      &:nth-child(2) { margin-left: 4px; }
     }
     .icon-vue {
       position: relative;
-      margin: 0 4px 0 4px;
+      &:nth-child(2) { margin-left: 4px; }
     }
     &.inversed {
       .text { order: 1; }
@@ -86,10 +87,8 @@ export default {
     color: black;
     box-shadow: 0 1px 1px rgba(black, .3), 0 0 1px 1px rgba(white, .15) inset;
     @include transition('background-color, box-shadow', .2s, ease);
-    &:not(.disabled) {
-      &.is-active, &:hover {
-        background-color: darken($apricot, 20%);
-      }
+    &:hover:not(.disabled) {
+      background-color: darken($apricot, 20%);
     }
   }
 
@@ -100,10 +99,8 @@ export default {
     border-radius: 3px;
     background: linear-gradient(to bottom, darken($apricot, 10%), darken($apricot, 20%));
     background-blend-mode: screen;
-    .text {
-      color: black;
-      font-weight: 500;
-    }
+    color: black;
+    font-weight: 500;
     box-shadow: 0 1px 2px rgba(black, .8), 0 0 1px 1px rgba(white, .15) inset;
     @include transition('background-color, border', .2s, ease);
     &:not(.disabled) {
@@ -112,30 +109,45 @@ export default {
         border-color: $apricot;
       }
     }
-    // &.notice {
-    //   background: linear-gradient(to bottom, darken($color-mustard, 30%), darken($color-mustard, 40%));
-    //   color: lighten($color-mustard, 40%);
-    //   &:hover:not(.disabled) {
-    //     background-color: darken($color-mustard, 60%);
-    //     border-color: $color-mustard;
-    //   }
-    // }
-    // &.google, &.alert {
-    //   background: linear-gradient(to bottom, #dd4a36, darken(#dd4a36, 10%));
-    //   color: lighten(#dd4a36, 40%);
-    //   &:hover:not(.disabled) {
-    //     background-color: darken(#c93737, 35%);
-    //     border-color: #c93737;
-    //   }
-    // }
-    // &.facebook {
-    //   background: linear-gradient(to bottom, #7289da, darken(#7289da, 10%));
-    //   color: lighten(#7289da, 40%);
-    //   &:hover:not(.disabled) {
-    //     background-color: darken(#7289da, 35%);
-    //     border-color: #7289da;
-    //   }
-    // }
+
+    &.tag {
+      padding: 2px 6px;
+      border-radius: 2px;
+      color: $apricot;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    &.red {
+      background: linear-gradient(to bottom, #dd4a36, darken(#dd4a36, 10%));
+      color: lighten(#dd4a36, 40%);
+      &:hover:not(.disabled) {
+        background-color: darken(#c93737, 35%);
+        border-color: #c93737;
+      }
+    }
+    &.blue {
+      background: linear-gradient(to bottom, #7289da, darken(#7289da, 10%));
+      color: lighten(#7289da, 30%);
+      &:hover:not(.disabled) {
+        background-color: darken(#7289da, 35%);
+        border-color: #7289da;
+      }
+    }
+  }
+
+  .border-style {
+    padding: 4px 14px;
+    border: 1px solid $apricot;
+    border-width: 2px 0;
+    border-radius: 4px;
+    color: $apricot;
+    font-weight: 400;
+    @include transition('background-color, color', .2s, ease);
+    &:hover {
+      background-color: rgba($apricot, .1);
+      color: lighten($apricot, 10%);
+    }
   }
 
   .search-style {
@@ -143,10 +155,8 @@ export default {
     border-radius: 0 6px 6px 0;
     background: linear-gradient(to bottom, darken($apricot, 10%), darken($apricot, 20%));
     background-blend-mode: screen;
-    .icon {
-      font-weight: 600;
-      color: black;
-    }
+    font-weight: 600;
+    color: black;
     @include transition('background-color, border', .2s, ease);
     &:before {
       content: "";
@@ -163,68 +173,6 @@ export default {
         background-color: darken($apricot, 35%);
         border-color: $apricot;
       }
-    }
-  }
-
-  .tab-style {
-    padding: 8px 20px;
-    border-radius: 6px 6px 0 0;
-    background: linear-gradient(to bottom, darken($apricot, 10%), darken($apricot, 20%));
-    background-blend-mode: screen;
-    color: lighten($apricot, 40%);
-    box-shadow: 0 -1px 0 rgba(black, .8);
-    @include transition('background-color, border', .2s, ease);
-    z-index: 1;
-    &:before {
-      content: "";
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      border-radius: 6px 6px 0 0;
-      box-shadow: -1px 0 0 darken($apricot, 45%), 1px 0 0 darken($apricot, 45%);
-    }
-    &.active {
-      &:before {
-        bottom: 8px;
-      }
-    }
-    &:not(.disabled) {
-      &.active, &:hover {
-        background-color: lighten($apricot, 30%);
-        border-color: $apricot;
-      }
-    }
-  }
-
-  .plain-style {
-    padding: 10px;
-    @include transition('color', .2s, ease);
-    &:hover, &.active { color: lighten($apricot, 20%); }
-  }
-
-  .icon-style {
-    .icon-wrapper { margin: 0; }
-    @include transition('color', .2s, ease);
-    &:hover, &.active { color: lighten($apricot, 20%); }
-  }
-
-  .header-style {
-    padding: 8px 10px;
-    font-size: 18px;
-    @include transition('color, background-color', .2s, ease);
-    &:hover, &.active { color: lighten($apricot, 20%); }
-    &.active { background-color: rgba(darken($apricot, 20%), .3); }
-  }
-
-  .expand-style {
-    padding: 4px 12px;
-    .text { flex: 1; }
-    @include transition('color, background-color', .2s, ease);
-    &:hover, &.active {
-      color: lighten($apricot, 20%);
-      background-color: rgba($apricot, .2);
     }
   }
 }

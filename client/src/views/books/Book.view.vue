@@ -54,7 +54,7 @@ export default {
           ],
           validation: [
             { regex: new RegExp('^[A-Za-z0-9]{0,32}$'), error: 'Name must contain only alphanumeric characters up to 32 characters' },
-            { regex: new RegExp('^.{3,512}$'), error: 'The review must have between 3 and 512 characters' },
+            { regex: new RegExp('^.{3,512}$'), error: 'The review message must have between 3 and 512 characters' },
           ],
         },
       },

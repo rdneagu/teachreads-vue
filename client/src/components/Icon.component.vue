@@ -26,7 +26,7 @@ export default {
 <style lang="scss" scoped>
 @import '@/scss/_mixins';
 
-@include font-face('techreads-ico', '../assets/fonts/techreads-ico/techreads-ico', normal, normal, ttf woff svg, 'block', 'crx9ge');
+@include font-face('techreads-ico', '../assets/fonts/techreads-ico/techreads-ico', normal, normal, ttf woff svg, 'block', 'crx9gh');
 
 $icon-search: "\e900";
 $icon-star_outline: "\e901";
@@ -47,6 +47,8 @@ $icon-heart-o: "\e90e";
 $icon-heart: "\e90f";
 $icon-bookmark: "\e910";
 $icon-bookmark_outline: "\e911";
+$icon-minus: "\e913";
+$icon-plus1: "\e915";
 
 .icon {
   position: relative;
@@ -81,4 +83,6 @@ $icon-bookmark_outline: "\e911";
 .icon-heart:before { content: $icon-heart; }
 .icon-bookmark:before { content: $icon-bookmark; }
 .icon-bookmark_outline:before { content: $icon-bookmark_outline; }
+.icon-minus:before { content: $icon-minus; }
+.icon-plus1:before { content: $icon-plus1; }
 </style>

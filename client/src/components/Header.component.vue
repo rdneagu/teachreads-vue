@@ -7,9 +7,12 @@
       </div>
     </section>
     <section class="header-search">
-      <input placeholder="quick search" />
-      <!-- <div class="search-filter">TITLE</div> -->
-      <Button name="search" icon="search" type="search" />
+      <div class="search-wrapper">
+        <input placeholder="quick search" v-model="search" />
+        <Button v-bind="buttons.filter" v-model:dropdown="dropdowns.filter" />
+        <Button :href="getSearchQuery" name="search" icon="search" type="search" />
+      </div>
+      <Button v-if="$route.query.search" href="/books" name="clear-search" icon="clear" type="menu" v-tooltip="{ text: 'Show all books'}"/>
     </section>
     <section class="header-user">
       <template v-if="switching.state">
@@ -39,11 +42,33 @@ export default {
   data() {
     return {
       buttons: {
-        confirmSwitch: { type: 'dialog', icon: 'confirm-switch', name: 'switch', click: () => this.confirmSwitch() },
-        cancelSwitch: { type: 'dialog', icon: 'cancel-switch', name: 'switch', click: () => this.cancelSwitch() },
-        startSwitch: { type: 'dialog', icon: 'switch', name: 'switch', click: () => this.startSwitch() },
-        openProfile: { type: 'border', name: 'view-profile' },
+        confirmSwitch: { name: 'switch', type: 'dialog', icon: 'confirm-switch', click: () => this.confirmSwitch() },
+        cancelSwitch: { name: 'switch', type: 'dialog', icon: 'cancel-switch', click: () => this.cancelSwitch() },
+        startSwitch: { name: 'switch', type: 'dialog', icon: 'switch', click: () => this.startSwitch() },
+        openProfile: { name: 'view-profile', type: 'border' },
+        filter: {
+          name: 'search-filter',
+          icon: 'arrow_drop_down',
+          type: 'inversed menu',
+        },
       },
+      dropdowns: {
+        filter: {
+          id: 'filter',
+          title: 'Filters',
+          items: [
+            { text: 'auto', type: 'dropdown', default: true },
+            { text: 'title', type: 'dropdown' },
+            { text: 'description', type: 'dropdown' },
+            { text: 'authors', type: 'dropdown' },
+            { text: 'category', type: 'dropdown' },
+            { text: 'publisher', type: 'dropdown' },
+            { text: 'year', type: 'dropdown' },
+            { text: 'isbn', type: 'dropdown' },
+          ],
+        },
+      },
+      search: '',
       switching: {
         state: false,
         pending: false,
@@ -54,12 +79,10 @@ export default {
 
   async mounted() {
     window.addEventListener('scroll', this.OnScroll);
-
     const userCookie = this.$cookie.getCookie('user');
     if (userCookie) {
       await this.confirmSwitch(userCookie);
     }
-
     this.switching.value = this.getCurrentUser;
   },
 
@@ -68,6 +91,16 @@ export default {
   },
 
   computed: {
+    getSearchQuery() {
+      if (this.search.length) {
+        const query = [`?search=${this.search}`];
+        if (this.dropdowns.filter.selected) {
+          query.push(`filter=${this.dropdowns.filter.selected.text}`);
+        }
+        return query.join('&');
+      }
+      return null;
+    },
     getCurrentUser() {
       if (this.switching.state) {
         return this.switching.value;
@@ -177,31 +210,30 @@ export default {
     display: flex;
     align-items: center;
     margin: 0 20px;
-    border-radius: 6px;
-    background-color: rgba($apricot, .4);
 
-    input {
+    .search-wrapper {
       flex: 1;
-      padding: 5px 10px;
-      font-weight: 600;
+      display: flex;
+      border-radius: 4px;
+      background-color: rgba($apricot, .4);
 
-      @include set-placeholder($apricot);
-    }
+      input {
+        flex: 1;
+        padding: 5px 10px;
+        font-weight: 600;
 
-    .search-filter {
-      width: 100px;
-      padding: 0 10px;
-      font-size: 0.8em;
-      font-weight: 600;
-      text-align: center;
-    }
+        @include set-placeholder($apricot);
+      }
 
-    .search-icon {
-      align-self: stretch;
-      padding: 0 10px;
-      background-color: $apricot;
-      color: black;
+      .btn-search-filter { min-width: 160px; padding: 2px 10px;}
+      .search-icon {
+        align-self: stretch;
+        padding: 0 10px;
+        background-color: $apricot;
+        color: black;
+      }
     }
+    .btn-clear-search { font-size: 1.5em; padding: 2px 8px; }
   }
 
   .header-user {

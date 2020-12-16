@@ -20,5 +20,8 @@ module.exports = {
     'import/extensions': 'off',
     'no-bitwise': 'off',
     'no-param-reassign': 'off',
+    'vue/no-reserved-keys': 'off',
+    'no-underscore-dangle': ['error', { allowAfterThis: true }],
+    radix: ['error', 'as-needed'],
   },
 };

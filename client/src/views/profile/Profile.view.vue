@@ -1,8 +1,6 @@
 <template>
   <div v-if="user !== undefined" class="profile-vue">
-    <div v-if="user === null" class="e404">
-      <span class="message"><Icon name="warning" /> This user does not exist or has not saved anything!</span>
-    </div>
+    <Error v-if="user === null">This user does not exist or has not saved anything!</Error>
     <div v-else class="profile">
       <section class="interests-section">
         <span class="user">{{ $route.params.name }}</span>
@@ -42,11 +40,11 @@ import { invokeAPI } from '@/lib/util.js';
 
 import Book from '@/components/Book.component';
 import Button from '@/components/Button.component';
-import Icon from '@/components/Icon.component';
+import Error from '@/components/Error.component';
 
 export default {
   name: 'ProfileView',
-  components: { Book, Button, Icon },
+  components: { Book, Button, Error },
   data() {
     return {
       user: undefined,
@@ -90,33 +88,9 @@ export default {
 
 <style lang="scss">
 .view.profile-vue {
-  .profile, .e404 {
+  .profile {
     flex: 1;
     display: flex;
-  }
-
-  .e404 {
-    align-items: center;
-    justify-content: center;
-    .message {
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      border: 1px solid $error;
-      border-radius: 4px;
-      background-color: rgba($error, .2);
-      color: lighten($error, 20%);
-      font-weight: 600;
-      font-size: 1.6em;
-
-      .icon-vue .icon {
-        font-size: 1.5em;
-        margin-right: 10px;
-      }
-    }
-  }
-
-  .profile {
     .interests-section {
       position: fixed;
       display: flex;
@@ -186,10 +160,12 @@ export default {
       .tab {
         flex: 1;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 225px));
+        grid-template-columns: repeat(auto-fill, 240px);
+        grid-template-rows: repeat(auto-fit, minmax(0px, min-content));
         grid-column-gap: 20px;
         grid-row-gap: 20px;
-        justify-content: space-evenly;
+        justify-content: center;
+        justify-items: center;
       }
 
       .commend-wrapper {
@@ -200,10 +176,12 @@ export default {
         .commend-title { align-self: center; }
         .commend-books {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(100px, 225px));
+          grid-template-columns: repeat(auto-fit, 240px);
+          grid-template-rows: repeat(auto-fit, minmax(0px, min-content));
           grid-column-gap: 20px;
           grid-row-gap: 20px;
-          justify-content: center;
+          justify-content: space-evenly;
+          justify-items: center;
         }
       }
     }

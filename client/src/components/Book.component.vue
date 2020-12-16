@@ -371,7 +371,7 @@ export default {
   flex-direction: column;
   border-radius: 2px;
   background-color: rgba($apricot, .2);
-  width: 250px;
+  width: 240px;
   box-shadow: 0 4px 15px rgba(black, .8);
   .cover {
     height: 260px;
@@ -412,7 +412,6 @@ export default {
     }
 
     .rating {
-      flex: 1;
       display: flex;
       align-items: center;
       margin: 5px 0;

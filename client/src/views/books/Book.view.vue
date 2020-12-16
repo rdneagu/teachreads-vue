@@ -193,10 +193,11 @@ export default {
       }
       .similar-books {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 225px));
+        grid-template-columns: repeat(auto-fit, 240px);
+        grid-template-rows: repeat(auto-fit, minmax(0px, min-content));
         grid-column-gap: 20px;
         grid-row-gap: 20px;
-        justify-content: center;
+        justify-content: space-evenly;
         justify-items: center;
       }
     }

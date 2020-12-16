@@ -2,31 +2,53 @@
   <div v-if="isCondition" class="button-vue" v-tooltip="{ ...tooltip }">
     <router-link v-if="href" :to="href" class="button" :class="[ getName, getStyle, isActive ]">
       <Icon v-if="icon" :name="icon"></Icon>
-      <span v-if="text || $slots.default" class="text"><slot>{{ this.text }}</slot></span>
+      <span v-if="getText || $slots.default" class="text"><slot>{{ getText }}</slot></span>
     </router-link>
     <div v-else class="button" :class="[ getName, getStyle, isDisabled, isActive ]" @click.capture="OnButtonClick">
       <Icon v-if="icon" :name="isPending"></Icon>
-      <span v-if="text || $slots.default" class="text"><slot>{{ this.text }}</slot></span>
+      <span v-if="getText || $slots.default" class="text"><slot>{{ getText }}</slot></span>
     </div>
+    <Dropdown
+      v-if="_dropdown && _dropdown.items"
+      v-bind="_dropdown"
+      v-model:selected="_dropdown.selected"
+      v-model:visible="_dropdown.visible"
+    />
   </div>
 </template>
 
 <script>
-import Icon from './Icon.component.vue';
+import { getSafe } from '@/lib/util';
+
+import Dropdown from './Dropdown.component';
+import Icon from './Icon.component';
 
 export default {
   name: 'ButtonComponent',
-  props: ['name', 'href', 'type', 'icon', 'text', 'click', 'disabled', 'active', 'pending', 'condition', 'tooltip'],
-  components: { Icon },
+  components: { Icon, Dropdown },
+  props: ['name', 'href', 'type', 'icon', 'text', 'click', 'disabled', 'active', 'pending', 'condition', 'tooltip', 'dropdown'],
+  emits: ['update:dropdown'],
+  data() {
+    return {
+      _dropdown: this.dropdown,
+    };
+  },
   computed: {
     getName() {
       return (this.name) ? `btn-${this.name}` : null;
+    },
+    getText() {
+      let { text } = this;
+      if (this._dropdown) {
+        text = getSafe(() => this._dropdown.selected.text) || this._dropdown.title || '...';
+      }
+      return text;
     },
     getStyle() {
       return (this.type) ? `${this.type}-style` : null;
     },
     isActive() {
-      return (this.active || this.$route.path.slice(1) === this.href) ? 'active' : false;
+      return (getSafe(() => this._dropdown.visible) || this.$route.path.slice(1) === this.href) ? 'active' : false;
     },
     isDisabled() {
       return (this.disabled) ? 'disabled' : null;
@@ -41,8 +63,20 @@ export default {
   },
   methods: {
     async OnButtonClick() {
-      if (typeof (this.click) !== 'function' || this.disabled) return false;
+      if (this.disabled) return false;
+      if (this._dropdown) {
+        this._dropdown.visible = !this._dropdown.visible;
+      }
+      if (typeof (this.click) !== 'function') return false;
       return this.click();
+    },
+  },
+  watch: {
+    _dropdown: {
+      deep: true,
+      handler(next) {
+        this.$emit('update:dropdown', next);
+      },
     },
   },
 };
@@ -52,15 +86,17 @@ export default {
 @import '@/scss/_mixins.scss';
 
 .button-vue {
+  display: flex;
   position: relative;
   .button {
+    flex: 1;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     color: black;
     font-weight: 600;
-    word-wrap: nowrap;
+    white-space: nowrap;
     cursor: pointer;
     .text {
       text-align: center;
@@ -173,6 +209,36 @@ export default {
         background-color: darken($apricot, 35%);
         border-color: $apricot;
       }
+    }
+  }
+
+  .dropdown-style {
+    justify-content: flex-start;
+    padding: 8px 12px;
+    color: $apricot;
+    font-size: 14px;
+    font-weight: 600;
+    @include transition('background-color, color', .4s, ease);
+    .text { @include transition('padding', .2s, ease); }
+    &:hover, &.active {
+      background-color: lighten($dark-apricot, 10%);
+      color: lighten($apricot, 20%);
+      .text { padding-left: 5px; }
+    }
+  }
+
+  .menu-style {
+    flex: 1;
+    align-self: stretch;
+    padding: 10px;
+    border-radius: 4px;
+    color: $apricot;
+    font-weight: 600;
+    .text { flex: 1; }
+    @include transition('color, background-color', .2s, ease);
+    &:not(.disabled) {
+      &.active, &:hover { color: lighten($apricot, 20%); }
+      &.active { background-color: rgba($apricot, .4); }
     }
   }
 }

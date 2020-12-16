@@ -58,7 +58,8 @@ export default {
     .h1-title { align-self: center; }
     .best-rated-list {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 225px));
+      grid-template-columns: repeat(auto-fit, 240px);
+      grid-template-rows: repeat(auto-fit, minmax(0px, min-content));
       grid-column-gap: 4px;
       grid-row-gap: 4px;
       justify-content: space-evenly;

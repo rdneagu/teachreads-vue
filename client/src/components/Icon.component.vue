@@ -49,6 +49,8 @@ $icon-bookmark: "\e910";
 $icon-bookmark_outline: "\e911";
 $icon-minus: "\e913";
 $icon-plus1: "\e915";
+$icon-arrow_drop_down: "\e912";
+$icon-clear: "\e914";
 
 .icon {
   position: relative;
@@ -85,4 +87,6 @@ $icon-plus1: "\e915";
 .icon-bookmark_outline:before { content: $icon-bookmark_outline; }
 .icon-minus:before { content: $icon-minus; }
 .icon-plus1:before { content: $icon-plus1; }
+.icon-arrow_drop_down:before { content: $icon-arrow_drop_down; }
+.icon-clear:before { content: $icon-clear; }
 </style>

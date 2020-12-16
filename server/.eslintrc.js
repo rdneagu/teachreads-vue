@@ -19,7 +19,7 @@ module.exports = {
     'import/extensions': 'off',
     'no-bitwise': 'off',
     'no-param-reassign': 'off',
-    'radix': ['error', 'as-needed'],
+    radix: ['error', 'as-needed'],
     'no-eval': 'off',
   },
 };

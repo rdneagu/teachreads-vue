@@ -19,6 +19,7 @@
     "express": "^4.17.1",
     "lodash": "^4.17.20",
     "morgan": "^1.10.0",
+    "velocity-animate": "^2.0.6",
     "vue": "^3.0.0",
     "vue-cookie-next": "^1.0.3",
     "vue-router": "^4.0.0-0",

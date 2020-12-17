@@ -93,7 +93,7 @@ export default {
   computed: {
     getSearchQuery() {
       if (this.search.length) {
-        const query = [`?search=${this.search}`];
+        const query = [`/books?search=${this.search}`];
         if (this.dropdowns.filter.selected) {
           query.push(`filter=${this.dropdowns.filter.selected.text}`);
         }

@@ -5,6 +5,7 @@
       <span class="title" :title="book.title">{{ book.title }}</span>
       <span class="author" :title="getAuthors">by <span class="author-name">{{ getAuthors }}</span></span>
       <div class="category-wrapper">
+        <span class="release">{{ book.year }}</span>
         <span class="category">{{ book.category }}</span>
         <Button
           v-if="spotlight && $store.state.user"
@@ -409,6 +410,14 @@ export default {
       display: flex;
       align-items: center;
       margin: 10px 0 5px 0;
+
+      .release {
+        margin-right: 6px;
+        padding-right: 6px;
+        font-family: Arial;
+        font-weight: 600;
+        border-right: 1px solid $apricot;
+      }
     }
 
     .rating {

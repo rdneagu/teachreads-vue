@@ -26,31 +26,7 @@ export default {
 <style lang="scss" scoped>
 @import '@/scss/_mixins';
 
-@include font-face('techreads-ico', '../assets/fonts/techreads-ico/techreads-ico', normal, normal, ttf woff svg, 'block', 'crx9gh');
-
-$icon-search: "\e900";
-$icon-star_outline: "\e901";
-$icon-star_half: "\e902";
-$icon-star: "\e903";
-$icon-person: "\e904";
-$icon-chat: "\e905";
-$icon-chat1: "\e906";
-$icon-shopping-cart: "\e907";
-$icon-book: "\e908";
-$icon-menu_book: "\e909";
-$icon-warning: "\e90a";
-$icon-books: "\e920";
-$icon-confirm-switch: "\e90b";
-$icon-cancel-switch: "\e90c";
-$icon-switch: "\e90d";
-$icon-heart-o: "\e90e";
-$icon-heart: "\e90f";
-$icon-bookmark: "\e910";
-$icon-bookmark_outline: "\e911";
-$icon-minus: "\e913";
-$icon-plus1: "\e915";
-$icon-arrow_drop_down: "\e912";
-$icon-clear: "\e914";
+@include font-face('techreads-ico', '../assets/fonts/techreads-ico/techreads-ico', normal, normal, ttf woff svg, 'block', 'crx9gi');
 
 .icon {
   position: relative;
@@ -89,4 +65,6 @@ $icon-clear: "\e914";
 .icon-plus1:before { content: $icon-plus1; }
 .icon-arrow_drop_down:before { content: $icon-arrow_drop_down; }
 .icon-clear:before { content: $icon-clear; }
+.icon-check:before { content: $icon-check; }
+.icon-check1:before { content: $icon-check1; }
 </style>

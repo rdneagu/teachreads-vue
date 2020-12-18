@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const logger = require('morgan');
-const debug = require('debug')('techreads-server:index');
+// const debug = require('debug')('techreads-server:index');
 
 // Load custom routes
 const { booksRoutes, historyRoutes, interestsRoutes, wishlistRoutes } = require('./routes/_index');
@@ -30,4 +30,4 @@ app.get('*', (_, res) => {
 const port = parseInt(process.env.PORT || '3000');
 app.listen(port);
 
-debug(`Server is listening on port ${port}`);
+console.log(`Server is listening on port ${port}`);

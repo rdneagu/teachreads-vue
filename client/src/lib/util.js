@@ -29,12 +29,23 @@ export function getSafe(fn) {
   return undefined;
 }
 
+/**
+ * Returns a readable date in format 'dd MM yyyy at HH:MM:SS'
+ *
+ * @param {Number} timestamp        # Timestamp to parse
+ * @returns {String}  Returns the string with the readable date
+ */
 export function formatReadableDate(timestamp) {
   const date = new Date(timestamp);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-  const [year, month, day] = [date.getFullYear(), date.getMonth(), date.getDate()];
-
+  const [
+    year = date.getFullYear(),
+    month = date.getMonth(),
+    day = date.getDate().toString().padStart(2, '0'),
+    hour = date.getHours().toString().padStart(2, '0'),
+    minutes = date.getMinutes().toString().padStart(2, '0'),
+    seconds = date.getSeconds().toString().padStart(2, '0'),
+  ] = [];
   return `${day} ${months[month]} ${year} at ${hour}:${minutes}:${seconds}`;
 }
 

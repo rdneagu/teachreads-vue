@@ -9,7 +9,7 @@
           v-if="dropdowns.sort.selected"
           name="clear-sort" icon="clear"
           type="menu"
-          :click="clearSort"
+          :click="resetSort"
           v-tooltip="{ text: 'Remove sorting' }" />
       </div>
       <h1 class="filter-title h1-title">Filter</h1>
@@ -63,9 +63,8 @@ export default {
       dropdowns: {
         sort: {
           id: 'sort',
-          title: 'Sort by',
           items: [
-            { text: 'title', type: 'dropdown', sortField: 'title' },
+            { text: 'title', type: 'dropdown', sortField: 'title', default: true },
             { text: 'rating', type: 'dropdown', sortField: 'avgRating' },
             { text: 'category', type: 'dropdown', sortField: 'category' },
             { text: 'year', type: 'dropdown', sortField: 'year' },
@@ -73,7 +72,6 @@ export default {
         },
         sortOrder: {
           id: 'sort-order',
-          title: 'Order',
           items: [
             { text: 'A to Z', type: 'dropdown', default: true },
             { text: 'Z to A', type: 'dropdown' },
@@ -118,6 +116,8 @@ export default {
     getBooks() {
       let { books } = this;
       if (books.length) {
+        // Get all the possible filtering categories
+        // and reduce the array into a pool of filters by category
         const categories = Object.keys(this.filters);
         const pool = categories.reduce((acc = [], category) => {
           const checked = this.filters[category].checkboxes.filter(checkbox => checkbox.selected).map(checkbox => checkbox.filter);
@@ -126,22 +126,24 @@ export default {
           }
           return acc;
         }, []);
+
+        // If there are filters selected, filter the books
+        // Example of eval argument: (book.category === 'CSS' || book.category === 'JavaScript') && (book.year === 2020)
         if (pool.length) {
           books = books.filter(book => eval(pool.join(' && '))); // eslint-disable-line
         }
 
+        // If sorting has been specified, start sorting depending on the field and order selection
         if (this.dropdowns.sort.selected) {
           const order = this.dropdowns.sortOrder.selected.text || 'A to Z';
           books = books.sort((book1, book2) => {
             const sort1 = book1[this.dropdowns.sort.selected.sortField];
             const sort2 = book2[this.dropdowns.sort.selected.sortField];
             if (order === 'A to Z') {
-              return (typeof sort1 === 'number') ? sort2 - sort1 : sort1.localeCompare(sort2);
+              return (typeof sort1 === 'number') ? sort1 - sort2 : sort1.localeCompare(sort2);
             }
-            return (typeof sort1 === 'number') ? sort1 - sort2 : sort2.localeCompare(sort1);
+            return (typeof sort1 === 'number') ? sort2 - sort1 : sort2.localeCompare(sort1);
           });
-        } else {
-          books = books.sort((book1, book2) => book1.title.localeCompare(book2.title));
         }
       }
       return books;
@@ -149,15 +151,18 @@ export default {
   },
 
   methods: {
-    clearSort() {
-      this.dropdowns.sort.selected = null;
+    resetSort() {
+      this.dropdowns.sort.selected = this.dropdowns.sort.items[0]; // eslint-disable-line prefer-destructuring
+      this.dropdowns.sortOrder.selected = this.dropdowns.sortOrder.items[0]; // eslint-disable-line prefer-destructuring
     },
+
     resetFilters() {
       this.filters.publisher.checkboxes = [];
       this.filters.category.checkboxes = [];
       this.filters.rating.checkboxes = [];
       this.filters.year.checkboxes = [];
     },
+
     updateFilters() {
       const books = this.getBooks;
       for (let i = 0; i < books.length; i++) {
@@ -204,6 +209,7 @@ export default {
       this.filters.rating.checkboxes = this.filters.rating.checkboxes.sort((c1, c2) => c2.val - c1.val);
       this.filters.year.checkboxes = this.filters.year.checkboxes.sort((c1, c2) => c2.val.localeCompare(c1.val));
     },
+
     async findBooks(query = {}) {
       this.pending = true;
       this.books = [];

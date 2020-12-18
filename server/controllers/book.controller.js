@@ -113,10 +113,17 @@ class BooksController {
     const wishlist = this.rootController.WishlistController.getWishlist(user).map(wish => wish.book);
     const history = this.rootController.HistoryController.getReadHistory(user).map(read => read.book);
     const interests = this.rootController.InterestsController.getInterests(user);
-    const distinctInterests = wishlist.concat(history).concat(interests)
+
+    // 1. Concatenate the wishlist array with the history array
+    // 2. Filter the result and keep only distinct books
+    // 3. Concatenate the result with the interests arary
+    // 4. Filter the result and keep only distinct categories
+    const distinctInterests = wishlist
+      .concat(history)
       .filter((book1, i, arr) => arr.findIndex(book2 => book1.id === book2.id) === i)
-      .filter((book1, i, arr) => arr.findIndex(book2 => book1.category === book2.category) === i)
+      .concat(interests)
       .filter((interest1, i, arr) => arr.findIndex(interest2 => interest1.category === interest2.category) === i);
+
     if (distinctInterests.length) {
       const recommendations = this.books.filter(book => distinctInterests.find(interest => interest.category === book.category))
         .sort((a, b) => b.avgRating - a.avgRating)

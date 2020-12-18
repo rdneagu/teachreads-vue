@@ -7,7 +7,13 @@
       </div>
       <hr class="separator" />
       <div class="reviews-add">
-        <Input v-for="(field) in forms.addReview.fields" :key="field.id" v-bind="field" @update:value="field.value = $event" />
+        <Input
+          v-for="(field) in forms.addReview.fields"
+          :key="field.id"
+          v-bind="field"
+          @update:value="field.value = $event"
+          @keyup.ctrl.enter="addReview"
+        />
         <Button type="dialog" icon="chat1" :click="addReview">Add review</Button>
       </div>
     </section>

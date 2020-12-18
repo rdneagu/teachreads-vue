@@ -38,7 +38,7 @@ export default {
         bottom: top + el.offsetHeight + 40,
         left: left - tooltip.offsetWidth - 10,
         center: left + el.offsetWidth / 2 - tooltip.offsetWidth / 2,
-        right: left + el.offsetWidth + 10,
+        right: left + tooltip.offsetWidth + 40,
       };
       const position = {
         x: { css: 'left', px: preset.center },

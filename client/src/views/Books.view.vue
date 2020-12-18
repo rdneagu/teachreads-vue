@@ -152,6 +152,12 @@ export default {
     clearSort() {
       this.dropdowns.sort.selected = null;
     },
+    resetFilters() {
+      this.filters.publisher.checkboxes = [];
+      this.filters.category.checkboxes = [];
+      this.filters.rating.checkboxes = [];
+      this.filters.year.checkboxes = [];
+    },
     updateFilters() {
       const books = this.getBooks;
       for (let i = 0; i < books.length; i++) {
@@ -219,6 +225,7 @@ export default {
           this.books = await invokeAPI('/api/books/search', { params });
         }
       } catch (err) { /* */ }
+      this.resetFilters();
       this.updateFilters();
       this.pending = false;
     },

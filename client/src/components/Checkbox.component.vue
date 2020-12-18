@@ -1,6 +1,6 @@
 <template>
   <div v-if="isCondition" class="checkbox-vue">
-    <input :id="getId" :name="getId" type="checkbox" v-model="model">
+    <input :id="getId" :name="getId" type="checkbox" v-model="model" tabIndex="0">
     <label :for="getId"><slot />{{ label }}</label>
   </div>
 </template>

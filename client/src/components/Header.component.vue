@@ -8,7 +8,7 @@
     </section>
     <section class="header-search">
       <div class="search-wrapper">
-        <input placeholder="quick search" v-model="search" />
+        <input placeholder="quick search" v-model="search" @keyup.enter="() => $router.push(getSearchQuery)" />
         <Button v-bind="buttons.filter" v-model:dropdown="dropdowns.filter" />
         <Button :href="getSearchQuery" name="search" icon="search" type="search" />
       </div>
@@ -18,7 +18,11 @@
       <template v-if="switching.state">
         <span v-if="switching.pending">Loading user</span>
         <template v-else>
-          <input class="input-switch" :value="getCurrentUser" @input="switching.value = $event.target.value" />
+          <input
+            class="input-switch"
+            :value="getCurrentUser"
+            @input="switching.value = $event.target.value"
+            @keyup.enter="buttons.confirmSwitch.click" />
           <Button v-bind="buttons.confirmSwitch" v-tooltip="{ text: 'Confirm Switch' }" />
           <Button v-bind="buttons.cancelSwitch" v-tooltip="{ text: 'Cancel Switch' }" />
         </template>

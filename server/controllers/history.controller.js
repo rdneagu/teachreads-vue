@@ -18,7 +18,13 @@ class HistoryController {
   getReadHistory() {
     const overload = {
       1: (user) => {
-        return this.history.filter(history => (history.user === user)).map(item => this.rootController.BooksController.getBookById(item.book));
+        return this.history.filter(history => (history.user === user)).map((item) => {
+          const { date } = item;
+          return {
+            book: this.rootController.BooksController.getBookById(item.book),
+            date
+          };
+        });
       },
       3: (req, res) => {
         const { user } = req.params;
@@ -37,7 +43,10 @@ class HistoryController {
     const { user, book, date = Date.now() } = req.body;
     this.history.push({ user, book, date });
     const bookData = this.rootController.BooksController.getBookById(book);
-    res.status(202).send(bookData);
+    res.status(202).send({
+      book: bookData,
+      date
+    });
   }
 
   deleteReadHistory(req, res) {

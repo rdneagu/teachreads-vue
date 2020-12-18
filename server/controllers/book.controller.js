@@ -110,8 +110,8 @@ class BooksController {
 
   getAllRecommendations(req, res) {
     const { user } = req.params;
-    const wishlist = this.rootController.WishlistController.getWishlist(user);
-    const history = this.rootController.HistoryController.getReadHistory(user);
+    const wishlist = this.rootController.WishlistController.getWishlist(user).map(wish => wish.book);
+    const history = this.rootController.HistoryController.getReadHistory(user).map(read => read.book);
     const interests = this.rootController.InterestsController.getInterests(user);
     const distinctInterests = wishlist.concat(history).concat(interests)
       .filter((book1, i, arr) => arr.findIndex(book2 => book1.id === book2.id) === i)
@@ -192,7 +192,8 @@ class BooksController {
     const { id } = req.params;
     const data = {
       reviewer: (req.body.reviewer.length) ? req.body.reviewer : 'Anonymous User',
-      review: req.body.review
+      review: req.body.review,
+      date: Date.now()
     };
     const book = this.books.find(b => b.id === id);
     book.reviews.push(data);

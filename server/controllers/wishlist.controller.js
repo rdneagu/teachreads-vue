@@ -18,7 +18,13 @@ class WishlistController {
   getWishlist() {
     const overload = {
       1: (user) => {
-        return this.wishlist.filter(item => (item.user === user)).map(item => this.rootController.BooksController.getBookById(item.book));
+        return this.wishlist.filter(item => (item.user === user)).map((item) => {
+          const { date } = item;
+          return {
+            book: this.rootController.BooksController.getBookById(item.book),
+            date
+          };
+        });
       },
       3: (req, res) => {
         const { user } = req.params;
@@ -34,10 +40,13 @@ class WishlistController {
   }
 
   addWishlistItem(req, res) {
-    const { user, book } = req.body;
-    this.wishlist.push({ user, book });
+    const { user, book, date = Date.now() } = req.body;
+    this.wishlist.push({ user, book, date });
     const bookData = this.rootController.BooksController.getBookById(book);
-    res.status(202).send(bookData);
+    res.status(202).send({
+      book: bookData,
+      date
+    });
   }
 
   deleteWishlistItem(req, res) {

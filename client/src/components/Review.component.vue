@@ -2,14 +2,20 @@
   <div class="review-vue">
     <span class="reviewer" :class="[ getAlternate ]">{{ review.reviewer }}</span>
     <span class="message">{{ review.review }}</span>
+    <span v-if="review.date" class="date">{{ getReadableDate }}</span>
   </div>
 </template>
 
 <script>
+import { formatReadableDate } from '@/lib/util';
+
 export default {
   name: 'ReviewComponent',
   props: ['id', 'review'],
   computed: {
+    getReadableDate() {
+      return formatReadableDate(this.review.date);
+    },
     getAlternate() {
       return (this.id % 2 === 0) ? 'left' : 'right';
     },
@@ -60,6 +66,16 @@ export default {
 
   .message {
     line-height: 1.2em;
+  }
+
+  .date {
+    position: absolute;
+    right: 0; bottom: 0;
+    padding: 2px;
+    font-family: 'Open Sans';
+    font-size: 0.8em;
+    font-weight: 600;
+    color: rgba($apricot, .3);
   }
 }
 </style>

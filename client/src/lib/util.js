@@ -29,4 +29,13 @@ export function getSafe(fn) {
   return undefined;
 }
 
+export function formatReadableDate(timestamp) {
+  const date = new Date(timestamp);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
+  const [year, month, day] = [date.getFullYear(), date.getMonth(), date.getDate()];
+
+  return `${day} ${months[month]} ${year} at ${hour}:${minutes}:${seconds}`;
+}
+
 export default { invokeAPI, getSafe };

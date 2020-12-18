@@ -1,8 +1,8 @@
 <template>
   <div class="home-vue">
     <div class="intro">
-      <section class="intro-text">Best book database for technology books</section>
-      <Button id="more" name="more" type="dialog">See More</Button>
+      <h1 class="intro-text">Best book database for technology books</h1>
+      <Button href="/books" id="more" name="more" type="dialog">See More</Button>
     </div>
     <div class="best-rated">
       <h1 class="h1-title">Best Rated</h1>
@@ -60,9 +60,9 @@ export default {
       display: grid;
       grid-template-columns: repeat(auto-fit, 240px);
       grid-template-rows: repeat(auto-fit, minmax(0px, min-content));
-      grid-column-gap: 4px;
-      grid-row-gap: 4px;
-      justify-content: space-evenly;
+      grid-column-gap: 20px;
+      grid-row-gap: 20px;
+      justify-content: center;
       justify-items: center;
       padding: 20px;
     }

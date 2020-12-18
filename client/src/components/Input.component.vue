@@ -113,6 +113,7 @@ export default {
     .input-limit {
       position: absolute;
       bottom: 2px; right: 2px;
+      font-family: 'Open Sans';
       font-size: 10px;
       font-weight: 600;
       color: rgba($apricot, .4);

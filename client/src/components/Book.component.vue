@@ -47,7 +47,7 @@
         </div>
         <div class="chart">
           <div v-if="book.ratings.length" class="condition-wrapper">
-            <apexchart height="180px" :options="chartOptions" :series="getChartSeries" />
+            <apexchart height="180px" width="320px" :options="chartOptions" :series="getChartSeries" />
           </div>
         </div>
       </template>
@@ -72,7 +72,6 @@ export default {
       ratingHovered: null,
       chartOptions: {
         chart: {
-          width: '280px',
           type: 'area',
           toolbar: {
             show: false,
@@ -121,7 +120,7 @@ export default {
           labels: {
             style: {
               colors: '#FFCDB2',
-              fontFamily: 'Arial',
+              fontFamily: 'Open Sans',
               fontSize: '14px',
             },
             formatter: value => value.toFixed(0),
@@ -167,9 +166,6 @@ export default {
     };
   },
   computed: {
-    isRatingHovered() {
-      return index => ((this.ratingHovered !== null && index <= this.ratingHovered) ? 'hovered' : null);
-    },
     isSpotlight() {
       return (this.spotlight) ? 'spotlight' : null;
     },
@@ -191,6 +187,33 @@ export default {
         }
       }
       return { avgRating, stars };
+    },
+    isRatingHovered() {
+      return index => ((this.ratingHovered !== null && index <= this.ratingHovered) ? 'hovered' : null);
+    },
+    isInterest() {
+      if (this.$store.state.user) {
+        const interestFound = this.$store.state.user.interests.find(interest => interest.category === this.book.category);
+        const state = {
+          icon: interestFound ? 'minus' : 'plus1',
+          type: `${interestFound ? 'red' : 'blue'} tag dialog`,
+          fn: interestFound ? this.deleteInterest : this.addInterest,
+        };
+        return state;
+      }
+      return false;
+    },
+    isHistory() {
+      if (this.$store.state.user) {
+        const historyFound = this.$store.state.user.history.find(history => history.book.id === this.book.id);
+        const state = {
+          icon: historyFound ? 'bookmark' : 'bookmark_outline',
+          text: historyFound ? 'Mark as unread' : 'Mark as read',
+          fn: historyFound ? this.deleteReadHistory : this.addReadHistory,
+        };
+        return state;
+      }
+      return false;
     },
     getChartSeries() {
       if (!this.book.ratings.length) {
@@ -242,33 +265,9 @@ export default {
 
       return data.map(d => [d[0], m * d[0] + b]);
     },
-    isInterest() {
-      if (this.$store.state.user) {
-        const interestFound = this.$store.state.user.interests.find(interest => interest.category === this.book.category);
-        const state = {
-          icon: interestFound ? 'minus' : 'plus1',
-          type: `${interestFound ? 'red' : 'blue'} tag dialog`,
-          fn: interestFound ? this.deleteInterest : this.addInterest,
-        };
-        return state;
-      }
-      return false;
-    },
-    isHistory() {
-      if (this.$store.state.user) {
-        const historyFound = this.$store.state.user.history.find(book => book.id === this.book.id);
-        const state = {
-          icon: historyFound ? 'bookmark' : 'bookmark_outline',
-          text: historyFound ? 'Mark as unread' : 'Mark as read',
-          fn: historyFound ? this.deleteReadHistory : this.addReadHistory,
-        };
-        return state;
-      }
-      return false;
-    },
     isWishlist() {
       if (this.$store.state.user) {
-        const wishlistFound = this.$store.state.user.wishlist.find(book => book.id === this.book.id);
+        const wishlistFound = this.$store.state.user.wishlist.find(wish => wish.book.id === this.book.id);
         const state = {
           icon: wishlistFound ? 'heart' : 'heart-o',
           text: wishlistFound ? 'Remove from wishlist' : 'Add to wishlist',
@@ -317,7 +316,7 @@ export default {
     async deleteReadHistory() {
       try {
         await invokeAPI(`/api/history/${this.$store.state.user.name}/delete/${this.book.id}`, { method: 'delete' });
-        const historyId = this.$store.state.user.history.findIndex(book => book.id === this.book.id);
+        const historyId = this.$store.state.user.history.findIndex(history => history.book.id === this.book.id);
         this.$store.state.user.history.splice(historyId, 1);
         this.book.nRead--;
       } catch (err) {
@@ -336,7 +335,7 @@ export default {
     async deleteWishlistItem() {
       try {
         await invokeAPI(`/api/wishlist/${this.$store.state.user.name}/delete/${this.book.id}`, { method: 'delete' });
-        const itemId = this.$store.state.user.wishlist.findIndex(book => book.id === this.book.id);
+        const itemId = this.$store.state.user.wishlist.findIndex(wish => wish.book.id === this.book.id);
         this.$store.state.user.wishlist.splice(itemId, 1);
         this.book.nWished--;
       } catch (err) {
@@ -414,7 +413,7 @@ export default {
       .release {
         margin-right: 6px;
         padding-right: 6px;
-        font-family: Arial;
+        font-family: 'Open Sans';
         font-weight: 600;
         border-right: 1px solid $apricot;
       }
@@ -429,7 +428,7 @@ export default {
       overflow: hidden;
       white-space: nowrap;
 
-      span { font-family: Arial; }
+      span { font-family: 'Open Sans'; }
       .icon-vue.hovered {
         color: $apricot;
         cursor: pointer;
@@ -493,6 +492,7 @@ export default {
         margin: 5px 0;
         font-size: 1.1em;
         line-height: 1.2em;
+        text-align: justify;
       }
       .chart {
         grid-area: chart;

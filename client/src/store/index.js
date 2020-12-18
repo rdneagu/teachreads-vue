@@ -7,6 +7,7 @@ export default createStore({
   },
   mutations: {
     setUser(state, user) {
+      console.log(user);
       state.user = user;
     },
     unsetUser(state) {

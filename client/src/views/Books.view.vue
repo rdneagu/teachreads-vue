@@ -1,6 +1,6 @@
 <template>
   <div class="books-vue">
-    <section class="sidebar">
+    <section v-if="books.length" class="sidebar">
       <h1 class="sorting-title h1-title">Sort</h1>
       <div class="sorting-wrapper">
         <Button v-bind="buttons.sort" :dropdown="dropdowns.sort" id="btn-sort" />
@@ -225,13 +225,10 @@ export default {
   },
 
   watch: {
-    $route: {
-      deep: true,
-      async handler(next, prev) {
-        if (next.name === prev.path) {
-          await this.findBooks(next);
-        }
-      },
+    '$route.query': async function OnRouteChange(next) {
+      if (this.$route.name === 'BooksView') {
+        await this.findBooks(next);
+      }
     },
   },
 };

@@ -197,7 +197,7 @@ export default {
         grid-template-rows: repeat(auto-fit, minmax(0px, min-content));
         grid-column-gap: 20px;
         grid-row-gap: 20px;
-        justify-content: space-evenly;
+        justify-content: center;
         justify-items: center;
       }
     }

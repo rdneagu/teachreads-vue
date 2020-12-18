@@ -18,10 +18,16 @@
         </div>
         <template v-else>
           <div v-if="getActiveTab === 'history'" class="tab history">
-            <Book v-for="book in user.history" :key="book.id" :book="book" />
+            <div v-for="read in user.history" :key="read.book.id" class="item-wrapper">
+              <span class="date">{{ formatReadableDate(read.date) }}</span>
+              <Book :book="read.book" />
+            </div>
           </div>
           <div v-else class="tab wishlist">
-            <Book v-for="book in user.wishlist" :key="book.id" :book="book" />
+            <div v-for="wish in user.wishlist" :key="wish.book.id" class="item-wrapper">
+              <span class="date">{{ formatReadableDate(wish.date) }}</span>
+              <Book :book="wish.book" />
+            </div>
           </div>
         </template>
         <div v-if="user.recommendations.length" class="commend-wrapper">
@@ -36,7 +42,7 @@
 </template>
 
 <script>
-import { invokeAPI } from '@/lib/util.js';
+import { invokeAPI, formatReadableDate } from '@/lib/util.js';
 
 import Book from '@/components/Book.component';
 import Button from '@/components/Button.component';
@@ -62,6 +68,9 @@ export default {
   },
 
   methods: {
+    formatReadableDate(date) {
+      return formatReadableDate(date);
+    },
     async loadProfile() {
       const { name } = this.$route.params;
       const history = await invokeAPI(`/api/history/${name}`);
@@ -160,12 +169,24 @@ export default {
       .tab {
         flex: 1;
         display: grid;
-        grid-template-columns: repeat(auto-fill, 240px);
+        grid-template-columns: repeat(auto-fit, 240px);
         grid-template-rows: repeat(auto-fit, minmax(0px, min-content));
         grid-column-gap: 20px;
         grid-row-gap: 20px;
         justify-content: center;
         justify-items: center;
+
+        .item-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          .date {
+            font-family: 'Open Sans';
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 2px;
+          }
+        }
       }
 
       .commend-wrapper {
@@ -180,7 +201,7 @@ export default {
           grid-template-rows: repeat(auto-fit, minmax(0px, min-content));
           grid-column-gap: 20px;
           grid-row-gap: 20px;
-          justify-content: space-evenly;
+          justify-content: center;
           justify-items: center;
         }
       }
